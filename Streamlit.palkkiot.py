@@ -2,10 +2,13 @@ import streamlit as st
 import pandas as pd
 
 def puhdista_tiedot(df):
-    st.write("Excel-sarakkeet:", df.columns.tolist())  # Tulostetaan sarakenimet tarkistusta varten
+    st.write("Excel-sarakkeet ennen käsittelyä:", df.columns.tolist())  # Tulostetaan sarakenimet tarkistusta varten
     df = df.iloc[4:, :].reset_index(drop=True)  # Poistetaan ylimääräiset rivit ja nollataan indeksit
     df.columns = df.iloc[0]  # Käytetään ensimmäistä riviä sarakeotsikoina
     df = df[1:].reset_index(drop=True)  # Poistetaan otsikkorivi taulukosta
+
+    # Tulostetaan sarakenimet uudelleen varmistaaksemme, että ne on asetettu oikein
+    st.write("Excel-sarakkeet käsittelyn jälkeen:", df.columns.tolist())
 
     # Valitaan vain tarvittavat sarakkeet riippumatta niiden sijainnista
     tarvittavat_sarakkeet = ["Juttu", "Avustaja", "Teksti", "Kuvat", "Yhteensä", "Laskutettu"]
