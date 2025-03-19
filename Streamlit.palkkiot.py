@@ -2,13 +2,19 @@ import streamlit as st
 import pandas as pd
 
 def puhdista_tiedot(df):
-    df = df.iloc[4:, 4:10]  # Poistetaan ylimääräiset rivit ja sarakkeet
-    df.columns = ["Juttu", "Avustaja", "Teksti", "Kuvat", "Yhteensä", "Laskutettu"]
-    df = df.dropna(subset=["Juttu", "Avustaja"], how="all")
-    df = df.iloc[1:].reset_index(drop=True)  # Poistetaan ylimääräinen otsikkorivi
-    df["Teksti"] = pd.to_numeric(df["Teksti"], errors="coerce").fillna(0)
-    df["Kuvat"] = pd.to_numeric(df["Kuvat"], errors="coerce").fillna(0)
-    df["Yhteensä"] = pd.to_numeric(df["Yhteensä"], errors="coerce").fillna(0)
+    df = df.iloc[4:, :].reset_index(drop=True)  # Poistetaan ylimääräiset rivit ja nollataan indeksit
+    df.columns = df.iloc[0]  # Käytetään ensimmäistä riviä sarakeotsikoina
+    df = df[1:].reset_index(drop=True)  # Poistetaan otsikkorivi taulukosta
+
+    # Valitaan vain tarvittavat sarakkeet riippumatta niiden sijainnista
+    tarvittavat_sarakkeet = ["Juttu", "Avustaja", "Teksti", "Kuvat", "Yhteensä", "Laskutettu"]
+    df = df[[col for col in tarvittavat_sarakkeet if col in df.columns]]
+
+    # Muunnetaan numerotyyppiset sarakkeet oikeaan muotoon
+    for sarake in ["Teksti", "Kuvat", "Yhteensä"]:
+        if sarake in df.columns:
+            df[sarake] = pd.to_numeric(df[sarake], errors="coerce").fillna(0)
+
     return df
 
 def muodosta_viestit(df):
